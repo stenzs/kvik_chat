@@ -1,4 +1,4 @@
 /venv/
 /.idea/
-/app/static/avatars/
-/app/config.py
+/static/avatars/
+/config.py
