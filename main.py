@@ -10,7 +10,7 @@ users = []
 @app.route('/', methods=['GET'])
 def hello():
     if request.method == 'GET':
-        return jsonify({'message': 'chat_server'}), 200
+        return jsonify({'message': 'chat_server15'}), 200
 
 @socketio.on('message')
 def handleMessage(msg):
