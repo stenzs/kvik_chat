@@ -1,0 +1,8 @@
+version: "3.9"
+services:
+  app:
+    image: docker.pkg.github.com/index-gg/cleex_backend/cleex-back:develop
+    container_name: kivk_chat
+    restart: always
+    ports:
+      - 6066:5000
