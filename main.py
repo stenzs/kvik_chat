@@ -4,7 +4,6 @@ from flask_socketio import SocketIO, send
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'mysecret'
 socketio = SocketIO(app, cors_allowed_origins='*')
-users = []
 
 
 @app.route('/', methods=['GET'])
@@ -19,8 +18,9 @@ def handleMessage(msg):
 
 @socketio.on('username', namespace='/private')
 def receive_username(username):
-    users.append({usernam: request.sid})
-    print(users)
+    print(request.sid)
+    print(username)
+    send(str(username) + ' ' + str(request.sid))
 
 
 if __name__ == '__main__':
