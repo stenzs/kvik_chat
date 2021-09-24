@@ -4,7 +4,7 @@ from datetime import datetime
 from database import Messages
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'mysecret'
+app.config['SECRET_KEY'] = 'mysecretkvikkvikkvikkvikikvik'
 socketio = SocketIO(app, cors_allowed_origins='*')
 
 
