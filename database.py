@@ -1,7 +1,8 @@
 from peewee import *
 import config
 
-db = PostgresqlDatabase(database=config.database, user=config.user, password=config.password, host=config.host, port=config.port, autocommit=True, autorollback=True)
+db = PostgresqlDatabase(database=config.database, user=config.user, password=config.password, host=config.host,
+                        port=config.port, autocommit=True, autorollback=True)
 
 
 class BaseModel(Model):
@@ -14,7 +15,7 @@ class Messages(BaseModel):
     room = TextField(column_name='room')
     sender_id = IntegerField(column_name='sender_id')
     message = TextField(column_name='message', null=True)
-    messages_isRead = BooleanField(column_name='messages_isRead', default=False)
+    messages_is_read = BooleanField(column_name='messages_is_read', default=False)
     time = TextField(column_name='time')
     delete = BooleanField(column_name='delete', default=False)
 
@@ -22,4 +23,4 @@ class Messages(BaseModel):
         table_name = 'messages'
 
 
-# db.create_tables([Messages])
+db.create_tables([Messages])

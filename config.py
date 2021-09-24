@@ -1,4 +1,4 @@
-SECRET_KEY = 'FASF352fFEFfaF#3%LKMnONLOC5SMhaGgYHbuVRTCUY56JYCvtgv'
+SECRET_KEY = 'FASF352fFEFfmysecretkvikkvikkvikkvikikvik3%LKMnONLOC5SMhaGgYHbuVRTCUY56JYCvtgv'
 database = "kvik_messenger"
 user = "kvik"
 password = "2262"
