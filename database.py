@@ -22,4 +22,4 @@ class Messages(BaseModel):
         table_name = 'messages'
 
 
-db.create_tables([Messages])
+# db.create_tables([Messages])
