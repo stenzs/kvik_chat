@@ -14,6 +14,7 @@ def hello():
         return jsonify({'message': 'chat_server16'}), 200
 
 
+
 @socketio.on('join')
 def join(message):
     if (message['recipient'])['id'] < (message['sender'])['id']:
