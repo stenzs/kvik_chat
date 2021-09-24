@@ -1,1 +1,6 @@
-123456789
+SECRET_KEY = 'FASF352fFEFfaF#3%LKMnONLOC5SMhaGgYHbuVRTCUY56JYCvtgv'
+database = "kvik_messenger"
+user = "kvik"
+password = "2262"
+host = "192.168.8.92"
+port = "5432"
