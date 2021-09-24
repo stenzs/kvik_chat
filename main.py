@@ -21,8 +21,17 @@ def join(message):
     else:
         room = str((message['sender'])['id']) + '&' + str((message['recipient'])['id'])
     join_room(room)
-    print("JOIN  " + room)
     send({'msg': 'user: ' + str((message['sender'])['id']) + ' has entered the room ' + str(room)}, to=room)
+
+
+@socketio.on('disconnect')
+def join(message):
+    if (message['recipient'])['id'] < (message['sender'])['id']:
+        room = str((message['recipient'])['id']) + '&' + str((message['sender'])['id'])
+    else:
+        room = str((message['sender'])['id']) + '&' + str((message['recipient'])['id'])
+    join_room(room)
+    send({'msg': 'user: ' + str((message['sender'])['id']) + ' disconnect the room ' + str(room)}, to=room)
 
 
 @socketio.on('text')
