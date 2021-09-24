@@ -23,22 +23,12 @@ def join(message):
     else:
         room = str((message['sender'])['id']) + '&' + str((message['recipient'])['id'])
     join_room(room)
-
-
-    #
-    # unread_messages = Messages.select().where(Messages.sender_id == (message['sender'])['id'],
-    #                                           Messages.messages_isRead is False, Messages.room == room)
-    #
-    #
-    #
-    # query = Messages.update(messages_isRead=True).where(Tweet.creation_date < today)
-    # query.execute()  # Returns the number of rows that were updated.
-
-    #
-    # print(unread_messages)
-
-
-
+    print('JOIN')
+    print((message['sender'])['id'])
+    print(room)
+    query = Messages.update(messages_is_read=True).where(Messages.sender_id == (message['sender'])['id'],
+                                                         Messages.messages_is_read == False, Messages.room == room)
+    query.execute()
     send({'msg': 'user: ' + str((message['sender'])['id']) + ' has entered the room ' + str(room)}, to=room)
 
 
