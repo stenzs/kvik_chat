@@ -14,7 +14,6 @@ def hello():
         return jsonify({'message': 'chat_server16'}), 200
 
 
-
 @socketio.on('join')
 def join(message):
     if (message['recipient'])['id'] < (message['sender'])['id']:
@@ -24,6 +23,7 @@ def join(message):
     join_room(room)
     print("JOIN  " + room)
     send({'msg': 'user: ' + str((message['sender'])['id']) + ' has entered the room ' + str(room)}, to=room)
+
 
 @socketio.on('text')
 def text(message):
@@ -37,13 +37,13 @@ def text(message):
     print(request.sid)
     print('ok')
 
+
 # @socketio.on('join', namespace='/chat')
 # def join(message):
 #     print(message)
 #     room = '123'
 #     join_room(room)
 #     emit('status', {'msg': 'stepan' + ' has entered the room.'}, room=room)
-
 # @socketio.on('message')
 # def handleMessage(msg):
 #     print(request.sid)
