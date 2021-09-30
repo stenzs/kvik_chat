@@ -77,7 +77,7 @@ def join(message):
     query = Messages.update(messages_is_read=True).where(Messages.sender_id == (message['recipient'])['id'],
                                                          Messages.messages_is_read == False, Messages.room == room)
     query.execute()
-    send({'msg': 'user: ' + str((message['sender'])['id']) + ' online ' + str(room)}, to=room)
+    send({'msg': 'user: ' + str((message['sender'])['id']) + ' online in the room ' + str(room)}, to=room)
 
 
 @socketio.on('typing')
