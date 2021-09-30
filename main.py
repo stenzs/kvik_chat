@@ -35,10 +35,15 @@ def chat_history():
             room = str(sender_id) + '&' + str(recipient_id) + '&' + str(product_id)
         if last_message_id == 0:
             query = list(Messages.select().where(Messages.room == room, Messages.delete != True).dicts().limit(page_limit).order_by(Messages.id.desc()))
+            check_room = Rooms.get_or_none(Rooms.name == room)
+            if check_room is None:
+                return jsonify({'message': 'success', 'data': query, 'room': None}), 200
+            else:
+                return jsonify({'message': 'success', 'data': query, 'room': {'seller_id': check_room.seller_id, 'seller_name': check_room.seller_name, 'seller_photo': check_room.seller_photo, 'customer_id': check_room.customer_id, 'customer_name': check_room.customer_name, 'customer_photo': check_room.customer_photo, 'product_id': check_room.product_id, 'product_name': check_room.product_name, 'product_photo': check_room.product_photo}}), 200
         else:
             query = list(Messages.select().where(Messages.room == room,
                                                  Messages.id < last_message_id, Messages.delete != True).dicts().limit(page_limit).order_by(Messages.id.desc()))
-        return jsonify({'message': 'success', 'data': query}), 200
+            return jsonify({'message': 'success', 'data': query}), 200
 
 
 @app.route('/chat_last_messages', methods=['POST'])
