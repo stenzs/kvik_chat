@@ -101,15 +101,5 @@ def text(message):
     send(message, to=room)
 
 
-# @socketio.on('join', namespace='/chat')
-# def join(message):
-#     room = '123'
-#     join_room(room)
-#     emit('status', {'msg': 'stepan' + ' has entered the room.'}, room=room)
-# @socketio.on('message')
-# def handleMessage(msg):
-#     send(msg, broadcast=True)
-
-
 if __name__ == '__main__':
     socketio.run(app, debug=True)
