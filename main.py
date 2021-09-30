@@ -50,7 +50,7 @@ def chat_last_messages():
             user_id = data['user_id']
         except KeyError:
             return jsonify({'message': 'invalid data'}), 422
-        subq = Messages.select(fn.MAX(Messages.id).alias('room')).group_by(Messages.room).dicts().where((Messages.sender_id == user_id) | (Messages.recipient_id == user_id))
+        subq = Messages.select(fn.MAX(Messages.id).alias('room')).group_by(Messages.room).dicts().where((Messages.sender_id == user_id and Messages.delete != True) | (Messages.recipient_id == user_id and Messages.delete != True))
         query = list(Messages.select().where(Messages.id.in_(subq)).dicts())
         return jsonify({'message': 'success', 'data': query}), 200
 
