@@ -34,11 +34,11 @@ def chat_history():
             room = str(sender_id) + '&' + str(recipient_id)
         if last_message_id == 0:
             query = list(Messages.select().where(Messages.sender_id == sender_id, Messages.recipient_id == recipient_id,
-                                                 Messages.room == room).dicts().limit(page_limit).order_by(Messages.id.desc()))
+                                                 Messages.room == room, Messages.delete != True).dicts().limit(page_limit).order_by(Messages.id.desc()))
         else:
             query = list(Messages.select().where(Messages.sender_id == sender_id,
                                                  Messages.recipient_id == recipient_id, Messages.room == room,
-                                                 Messages.id < last_message_id).dicts().limit(page_limit).order_by(Messages.id.desc()))
+                                                 Messages.id < last_message_id, Messages.delete != True).dicts().limit(page_limit).order_by(Messages.id.desc()))
         return jsonify({'message': 'success', 'data': query}), 200
 
 
