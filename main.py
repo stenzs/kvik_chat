@@ -78,6 +78,7 @@ def make_room():
             product_id = data['product_id']
             product_name = data['product_name']
             product_photo = data['product_photo']
+            product_price = data['product_price']
         except KeyError:
             return jsonify({'message': 'invalid data'}), 422
         if seller_id < customer_id:
@@ -88,7 +89,8 @@ def make_room():
         if check_room is None:
             Rooms.create(name=room, seller_id=seller_id, seller_name=seller_name, seller_photo=seller_photo,
                          customer_id=customer_id, customer_name=customer_name, customer_photo=customer_photo,
-                         product_id=product_id, product_name=product_name, product_photo=product_photo)
+                         product_id=product_id, product_name=product_name, product_photo=product_photo,
+                         product_price=product_price)
             return jsonify({'message': 'room created'}), 200
         return jsonify({'message': 'room already exist'}), 403
 
