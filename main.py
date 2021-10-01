@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 from flask_socketio import SocketIO, send, join_room
 from datetime import datetime
 from peewee import fn
@@ -7,6 +8,7 @@ import config
 from database import Messages, Rooms
 
 app = Flask(__name__)
+CORS(app)
 app.config['SECRET_KEY'] = config.SECRET_KEY
 socketio = SocketIO(app, cors_allowed_origins='*')
 
