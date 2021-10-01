@@ -36,7 +36,7 @@ class Rooms(BaseModel):
     product_id = IntegerField(column_name='product_id')
     product_name = TextField(column_name='product_name')
     product_photo = TextField(column_name='product_photo')
-    product_price = TextField(column_name='product_price')
+    product_price = IntegerField(column_name='product_price')
 
     class Meta:
         table_name = 'rooms'
