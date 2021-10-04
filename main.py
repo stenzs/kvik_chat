@@ -136,8 +136,8 @@ def text(message):
     else:
         room = str((message['sender'])['id']) + '&' + str((message['recipient'])['id']) + '&' + str((message['product'])['id'])
     Messages.create(room=room, sender_id=(message['sender'])['id'], recipient_id=(message['recipient'])['id'],
-                    message=message['message'], time=datetime.now().strftime({"y": '%Y', "mo": '%m', "d": '%d',
-                                                                              "h": '%H', "mi": '%M'}))
+                    message=message['message'], time=datetime.now().strftime(str({"y": "%Y", "mo": "%m", "d": "%d",
+                                                                              "h": "%H", "mi": "%M"})))
     send(message, to=room)
 
 
