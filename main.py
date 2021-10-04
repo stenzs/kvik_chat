@@ -1,3 +1,5 @@
+import json
+
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_socketio import SocketIO, send, join_room
@@ -58,6 +60,7 @@ def chat_last_messages():
             return jsonify({'message': 'invalid data'}), 422
 
         subq = Messages.select(fn.MAX(Messages.id).alias('room')).group_by(Messages.room).dicts().where(((Messages.sender_id == user_id) & (Messages.delete != True)) | ((Messages.recipient_id == user_id) & (Messages.delete != True)))
+
         query = list(Messages.select(Messages.message, Messages.messages_is_read, Messages.sender_id, Messages.time, Rooms.seller_id, Rooms.seller_name, Rooms.seller_photo, Rooms.customer_id, Rooms.customer_name, Rooms.customer_photo, Rooms.product_id, Rooms.product_name, Rooms.product_photo, Rooms.product_price).where(Messages.id.in_(subq)).dicts().order_by(Messages.id.desc()).join(Rooms, on=(Messages.room == Rooms.name)))
         # query = list(Messages.select(Messages.message, Messages.messages_is_read, Messages.sender_id, Messages.time, Rooms.seller_id, Rooms.seller_name, Rooms.seller_photo, Rooms.customer_id, Rooms.customer_name, Rooms.customer_photo, Rooms.product_id, Rooms.product_name, Rooms.product_photo).where(Messages.id.in_(subq)).dicts().order_by(Messages.id.desc()))
 
@@ -135,9 +138,12 @@ def text(message):
         room = str((message['recipient'])['id']) + '&' + str((message['sender'])['id']) + '&' + str((message['product'])['id'])
     else:
         room = str((message['sender'])['id']) + '&' + str((message['recipient'])['id']) + '&' + str((message['product'])['id'])
+    time_dict = {"y": datetime.now().strftime("%Y"), "mo": datetime.now().strftime("%m"),
+             "d": datetime.now().strftime("%d"), "h": datetime.now().strftime("%H"),
+             "mi": datetime.now().strftime("%M")}
+    time = json.dumps(time_dict)
     Messages.create(room=room, sender_id=(message['sender'])['id'], recipient_id=(message['recipient'])['id'],
-                    message=message['message'], time=datetime.now().strftime(str({"y": "%Y", "mo": "%m", "d": "%d",
-                                                                              "h": "%H", "mi": "%M"})))
+                    message=message['message'], time=time)
     send(message, to=room)
 
 
