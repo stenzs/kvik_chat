@@ -41,7 +41,7 @@ def chat_history():
             if check_room is None:
                 return jsonify({'message': 'success', 'data': query, 'room': None}), 200
             else:
-                return jsonify({'message': 'success', 'data': query, 'room': {'seller_id': check_room.seller_id, 'seller_name': check_room.seller_name, 'seller_photo': check_room.seller_photo, 'customer_id': check_room.customer_id, 'customer_name': check_room.customer_name, 'customer_photo': check_room.customer_photo, 'product_id': check_room.product_id, 'product_name': check_room.product_name, 'product_photo': check_room.product_photo}}), 200
+                return jsonify({'message': 'success', 'data': query, 'room': {'seller_id': check_room.seller_id, 'seller_name': check_room.seller_name, 'seller_photo': check_room.seller_photo, 'customer_id': check_room.customer_id, 'customer_name': check_room.customer_name, 'customer_photo': check_room.customer_photo, 'product_id': check_room.product_id, 'product_name': check_room.product_name, 'product_photo': check_room.product_photo, 'product_price': check_room.product_price}}), 200
         else:
             query = list(Messages.select().where(Messages.room == room,
                                                  Messages.id < last_message_id, Messages.delete != True).dicts().limit(page_limit).order_by(Messages.id.desc()))
