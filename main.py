@@ -1,11 +1,9 @@
 import json
-
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_socketio import SocketIO, send, join_room
 from datetime import datetime
 from peewee import fn
-
 import config
 from database import Messages, Rooms
 
@@ -37,6 +35,9 @@ def chat_history():
             room = str(recipient_id) + '&' + str(sender_id) + '&' + str(product_id)
         else:
             room = str(sender_id) + '&' + str(recipient_id) + '&' + str(product_id)
+        check_room = Rooms.get_or_none(Rooms.name == room)
+        if check_room is None:
+            return jsonify({'message': 'invalid room'}), 422
         if last_message_id == 0:
             query = list(Messages.select().where(Messages.room == room, Messages.delete != True).dicts().limit(page_limit).order_by(Messages.id.desc()))
             check_room = Rooms.get_or_none(Rooms.name == room)
@@ -58,12 +59,8 @@ def chat_last_messages():
             user_id = data['user_id']
         except KeyError:
             return jsonify({'message': 'invalid data'}), 422
-
         subq = Messages.select(fn.MAX(Messages.id).alias('room')).group_by(Messages.room).dicts().where(((Messages.sender_id == user_id) & (Messages.delete != True)) | ((Messages.recipient_id == user_id) & (Messages.delete != True)))
-
         query = list(Messages.select(Messages.message, Messages.messages_is_read, Messages.sender_id, Messages.time, Rooms.seller_id, Rooms.seller_name, Rooms.seller_photo, Rooms.customer_id, Rooms.customer_name, Rooms.customer_photo, Rooms.product_id, Rooms.product_name, Rooms.product_photo, Rooms.product_price).where(Messages.id.in_(subq)).dicts().order_by(Messages.id.desc()).join(Rooms, on=(Messages.room == Rooms.name)))
-        # query = list(Messages.select(Messages.message, Messages.messages_is_read, Messages.sender_id, Messages.time, Rooms.seller_id, Rooms.seller_name, Rooms.seller_photo, Rooms.customer_id, Rooms.customer_name, Rooms.customer_photo, Rooms.product_id, Rooms.product_name, Rooms.product_photo).where(Messages.id.in_(subq)).dicts().order_by(Messages.id.desc()))
-
         return jsonify({'message': 'success', 'data': list(query)}), 200
 
 
