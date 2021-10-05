@@ -133,13 +133,14 @@ def text(message):
         room = str((message['sender'])['id']) + '&' + str((message['recipient'])['id']) + '&' + str((message['product'])['id'])
     if len(message['message']) > 350:
         send({'msg': 'msg_to_looooong'}, to=room)
-    time_dict = {"y": datetime.now().strftime("%Y"), "mo": datetime.now().strftime("%m"),
-             "d": datetime.now().strftime("%d"), "h": datetime.now().strftime("%H"),
-             "mi": datetime.now().strftime("%M")}
-    time = json.dumps(time_dict)
-    Messages.create(room=room, sender_id=(message['sender'])['id'], recipient_id=(message['recipient'])['id'],
-                    message=message['message'], time=time)
-    send(message, to=room)
+    else:
+        time_dict = {"y": datetime.now().strftime("%Y"), "mo": datetime.now().strftime("%m"),
+                 "d": datetime.now().strftime("%d"), "h": datetime.now().strftime("%H"),
+                 "mi": datetime.now().strftime("%M")}
+        time = json.dumps(time_dict)
+        Messages.create(room=room, sender_id=(message['sender'])['id'], recipient_id=(message['recipient'])['id'],
+                        message=message['message'], time=time)
+        send(message, to=room)
 
 
 if __name__ == '__main__':
