@@ -100,7 +100,8 @@ def join(message):
     query = Messages.update(messages_is_read=True).where(Messages.sender_id == (message['recipient'])['id'],
                                                          Messages.messages_is_read == False, Messages.room == room)
     query.execute()
-    send({'msg': 'user: ' + str((message['sender'])['id']) + ' has entered the room ' + str(room)}, to=room)
+    send({'msg': 'user_join', 'user_jo': (message['sender'])['id']}, to=room)
+    # send({'msg': 'user: ' + str((message['sender'])['id']) + ' has entered the room ' + str(room)}, to=room)
 
 
 @socketio.on('online')
