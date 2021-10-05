@@ -112,8 +112,8 @@ def join(message):
     query = Messages.update(messages_is_read=True).where(Messages.sender_id == (message['recipient'])['id'],
                                                          Messages.messages_is_read == False, Messages.room == room)
     query.execute()
-    send({'msg': 'user: ' + str((message['sender'])['id']) + ' online in the room ' + str(room)}, to=room)
-
+    # send({'msg': 'user: ' + str((message['sender'])['id']) + ' online in the room ' + str(room)}, to=room)
+    send({'user': str((message['sender'])['id']), 'online': True}, to=room)
 
 @socketio.on('typing')
 def join(message):
@@ -123,7 +123,6 @@ def join(message):
         room = str((message['sender'])['id']) + '&' + str((message['recipient'])['id']) + '&' + str((message['product'])['id'])
     join_room(room)
     send({'msg': 'user_typing', 'user_t': (message['sender'])['id']}, to=room)
-
 
 @socketio.on('text')
 def text(message):
