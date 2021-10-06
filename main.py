@@ -1,7 +1,7 @@
 import json
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from flask_socketio import SocketIO, send, join_room
+from flask_socketio import SocketIO, send, join_room, leave_room
 from datetime import datetime
 from peewee import fn
 import config
@@ -90,6 +90,7 @@ def make_room():
             return jsonify({'message': 'room created'}), 200
         return jsonify({'message': 'room already exist'}), 403
 
+
 @socketio.on('join')
 def join(message):
     if (message['recipient'])['id'] < (message['sender'])['id']:
@@ -102,6 +103,16 @@ def join(message):
     query.execute()
     send({'msg': 'user_join', 'user_jo': (message['sender'])['id']}, to=room)
     # send({'msg': 'user: ' + str((message['sender'])['id']) + ' has entered the room ' + str(room)}, to=room)
+
+
+@socketio.on('leave')
+def join(message):
+    if (message['recipient'])['id'] < (message['sender'])['id']:
+        room = str((message['recipient'])['id']) + '&' + str((message['sender'])['id']) + '&' + str((message['product'])['id'])
+    else:
+        room = str((message['sender'])['id']) + '&' + str((message['recipient'])['id']) + '&' + str((message['product'])['id'])
+    leave_room(room)
+    send({'msg': 'user_leave', 'user_le': (message['sender'])['id']}, to=room)
 
 
 @socketio.on('online')
@@ -117,6 +128,7 @@ def join(message):
     # send({'user': str((message['sender'])['id']), 'online': True}, to=room)
     send({'msg': 'user_online', 'user_on': (message['sender'])['id']}, to=room)
 
+
 @socketio.on('typing')
 def join(message):
     if (message['recipient'])['id'] < (message['sender'])['id']:
@@ -126,8 +138,29 @@ def join(message):
     join_room(room)
     send({'msg': 'user_typing', 'user_t': (message['sender'])['id']}, to=room)
 
+
 @socketio.on('text')
 def text(message):
+    print(message)
+    if (message['recipient'])['id'] < (message['sender'])['id']:
+        room = str((message['recipient'])['id']) + '&' + str((message['sender'])['id']) + '&' + str((message['product'])['id'])
+    else:
+        room = str((message['sender'])['id']) + '&' + str((message['recipient'])['id']) + '&' + str((message['product'])['id'])
+    if len(message['message']) > 350:
+        send({'msg': 'msg_to_looooong'}, to=room)
+    else:
+        time_dict = {"y": datetime.now().strftime("%Y"), "mo": datetime.now().strftime("%m"),
+                 "d": datetime.now().strftime("%d"), "h": datetime.now().strftime("%H"),
+                 "mi": datetime.now().strftime("%M")}
+        time = json.dumps(time_dict)
+        Messages.create(room=room, sender_id=(message['sender'])['id'], recipient_id=(message['recipient'])['id'],
+                        message=message['message'], time=time)
+        send(message, to=room)
+
+
+@socketio.on('many_text')
+def text(message):
+
     if (message['recipient'])['id'] < (message['sender'])['id']:
         room = str((message['recipient'])['id']) + '&' + str((message['sender'])['id']) + '&' + str((message['product'])['id'])
     else:
