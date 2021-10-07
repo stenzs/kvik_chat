@@ -5,7 +5,7 @@ from flask_socketio import SocketIO, send, join_room, leave_room
 from datetime import datetime
 from peewee import fn
 import config
-from database import Messages, Rooms
+from database import Messages, Rooms, Tokens
 
 app = Flask(__name__)
 CORS(app)
@@ -17,6 +17,22 @@ socketio = SocketIO(app, cors_allowed_origins='*')
 def hello():
     if request.method == 'GET':
         return jsonify({'message': 'chat_server16'}), 200
+
+
+@app.route('/push_token', methods=['POST'])
+def push_token():
+    if request.method == 'POST':
+        data = request.get_json()
+        try:
+            user_id = data['user_id']
+            platform = data['platform']
+            token = data['token']
+        except KeyError:
+            return jsonify({'message': 'invalid data'}), 422
+        check_token = Tokens.get_or_none(Tokens.token == token)
+        if check_token is None:
+            Tokens.create(user_id=user_id, platform=platform, token=token)
+        return jsonify({'message': 'success'}), 200
 
 
 @app.route('/chat_history', methods=['POST'])

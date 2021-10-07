@@ -35,4 +35,14 @@ class Rooms(BaseModel):
         table_name = 'rooms'
 
 
-db.create_tables([Rooms])
+class Tokens(BaseModel):
+    id = PrimaryKeyField(column_name='id', primary_key=True, unique=True)
+    user_id = IntegerField(column_name='user_id')
+    platform = IntegerField(column_name='platform')
+    token = TextField(column_name='token', unique=True)
+
+    class Meta:
+        table_name = 'tokens'
+
+
+db.create_tables([Tokens])
