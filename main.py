@@ -4,6 +4,7 @@ from flask_cors import CORS
 from flask_socketio import SocketIO, send, join_room, leave_room
 from datetime import datetime
 from peewee import fn
+import requests
 import config
 from database import Messages, Rooms, Tokens
 
@@ -33,6 +34,43 @@ def push_token():
         if check_token is None:
             Tokens.create(user_id=user_id, platform=platform, token=token)
         return jsonify({'message': 'success'}), 200
+
+
+@app.route('/send_push', methods=['POST'])
+def send_push():
+    if request.method == 'POST':
+        data = request.get_json()
+        try:
+            user_id = data['user_id']
+            message = data['message']
+            user_name = data['user_name']
+        except KeyError:
+            return jsonify({'message': 'invalid data'}), 422
+        token_list = list(Tokens.select().where(Tokens.user_id == user_id).dicts())
+        print(token_list)
+        web_tokens = []
+        ios_tokens = []
+        android_tokens = []
+        for string in token_list:
+            if string['platform'] == 3:
+                web_tokens.append(string['token'])
+            elif string['platform'] == 2:
+                ios_tokens.append(string['token'])
+            elif string['platform'] == 1:
+                android_tokens.append(string['token'])
+        if len(web_tokens) > 0:
+            for token in web_tokens:
+                headers = {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'key=' + config.web_token_key
+                }
+                body = {
+                    'notification': {
+                        'title': 'KVIK',
+                        'body': 'У тебя новое сообщение от ' + user_name + ':\n' + message},
+                    'to': token, 'priority': 'high'}
+                response = requests.post("https://fcm.googleapis.com/fcm/send", headers=headers, data=json.dumps(body))
+        return jsonify({"message": 'success'})
 
 
 @app.route('/chat_history', methods=['POST'])
