@@ -40,7 +40,7 @@ def chat_history():
             return jsonify({'message': 'invalid room'}), 422
         if last_message_id == 0:
             query = list(Messages.select().where(Messages.room == room, Messages.delete != True).dicts().limit(page_limit).order_by(Messages.id.desc()))
-            return jsonify({'message': 'success', 'data': query, 'room': {'seller_id': check_room.seller_id, 'seller_name': check_room.seller_name, 'seller_photo': check_room.seller_photo, 'customer_id': check_room.customer_id, 'customer_name': check_room.customer_name, 'customer_photo': check_room.customer_photo, 'product_id': check_room.product_id, 'product_name': check_room.product_name, 'product_photo': check_room.product_photo, 'product_price': check_room.product_price}}), 200
+            return jsonify({'message': 'success', 'data': query, 'room': {'seller_id': check_room.seller_id, 'customer_id': check_room.customer_id, 'product_id': check_room.product_id}}), 200
         else:
             query = list(Messages.select().where(Messages.room == room,
                                                  Messages.id < last_message_id, Messages.delete != True).dicts().limit(page_limit).order_by(Messages.id.desc()))
@@ -56,7 +56,7 @@ def chat_last_messages():
         except KeyError:
             return jsonify({'message': 'invalid data'}), 422
         subq = Messages.select(fn.MAX(Messages.id).alias('room')).group_by(Messages.room).dicts().where(((Messages.sender_id == user_id) & (Messages.delete != True)) | ((Messages.recipient_id == user_id) & (Messages.delete != True)))
-        query = list(Messages.select(Messages.message, Messages.messages_is_read, Messages.sender_id, Messages.time, Rooms.seller_id, Rooms.seller_name, Rooms.seller_photo, Rooms.customer_id, Rooms.customer_name, Rooms.customer_photo, Rooms.product_id, Rooms.product_name, Rooms.product_photo, Rooms.product_price).where(Messages.id.in_(subq)).dicts().order_by(Messages.id.desc()).join(Rooms, on=(Messages.room == Rooms.name)))
+        query = list(Messages.select(Messages.message, Messages.messages_is_read, Messages.sender_id, Messages.time, Rooms.seller_id, Rooms.customer_id, Rooms.product_id).where(Messages.id.in_(subq)).dicts().order_by(Messages.id.desc()).join(Rooms, on=(Messages.room == Rooms.name)))
         return jsonify({'message': 'success', 'data': list(query)}), 200
 
 
@@ -66,15 +66,8 @@ def make_room():
         data = request.get_json()
         try:
             seller_id = data['seller_id']
-            seller_name = data['seller_name']
-            seller_photo = data['seller_photo']
             customer_id = data['customer_id']
-            customer_name = data['customer_name']
-            customer_photo = data['customer_photo']
             product_id = data['product_id']
-            product_name = data['product_name']
-            product_photo = data['product_photo']
-            product_price = data['product_price']
         except KeyError:
             return jsonify({'message': 'invalid data'}), 422
         if seller_id < customer_id:
@@ -83,10 +76,7 @@ def make_room():
             room = str(customer_id) + '&' + str(seller_id) + '&' + str(product_id)
         check_room = Rooms.get_or_none(Rooms.name == room)
         if check_room is None:
-            Rooms.create(name=room, seller_id=seller_id, seller_name=seller_name, seller_photo=seller_photo,
-                         customer_id=customer_id, customer_name=customer_name, customer_photo=customer_photo,
-                         product_id=product_id, product_name=product_name, product_photo=product_photo,
-                         product_price=product_price)
+            Rooms.create(name=room, seller_id=seller_id, customer_id=customer_id, product_id=product_id)
             return jsonify({'message': 'room created'}), 200
         return jsonify({'message': 'room already exist'}), 403
 
@@ -102,7 +92,6 @@ def join(message):
                                                          Messages.messages_is_read == False, Messages.room == room)
     query.execute()
     send({'msg': 'user_join', 'user_jo': (message['sender'])['id']}, to=room)
-    # send({'msg': 'user: ' + str((message['sender'])['id']) + ' has entered the room ' + str(room)}, to=room)
 
 
 @socketio.on('leave')
@@ -124,8 +113,6 @@ def join(message):
     query = Messages.update(messages_is_read=True).where(Messages.sender_id == (message['recipient'])['id'],
                                                          Messages.messages_is_read == False, Messages.room == room)
     query.execute()
-    # send({'msg': 'user: ' + str((message['sender'])['id']) + ' online in the room ' + str(room)}, to=room)
-    # send({'user': str((message['sender'])['id']), 'online': True}, to=room)
     send({'msg': 'user_online', 'user_on': (message['sender'])['id']}, to=room)
 
 
@@ -142,25 +129,7 @@ def join(message):
 @socketio.on('text')
 def text(message):
     print(message)
-    if (message['recipient'])['id'] < (message['sender'])['id']:
-        room = str((message['recipient'])['id']) + '&' + str((message['sender'])['id']) + '&' + str((message['product'])['id'])
-    else:
-        room = str((message['sender'])['id']) + '&' + str((message['recipient'])['id']) + '&' + str((message['product'])['id'])
-    if len(message['message']) > 350:
-        send({'msg': 'msg_to_looooong'}, to=room)
-    else:
-        time_dict = {"y": datetime.now().strftime("%Y"), "mo": datetime.now().strftime("%m"),
-                 "d": datetime.now().strftime("%d"), "h": datetime.now().strftime("%H"),
-                 "mi": datetime.now().strftime("%M")}
-        time = json.dumps(time_dict)
-        Messages.create(room=room, sender_id=(message['sender'])['id'], recipient_id=(message['recipient'])['id'],
-                        message=message['message'], time=time)
-        send(message, to=room)
-
-
-@socketio.on('many_text')
-def text(message):
-
+    print(message['time'])
     if (message['recipient'])['id'] < (message['sender'])['id']:
         room = str((message['recipient'])['id']) + '&' + str((message['sender'])['id']) + '&' + str((message['product'])['id'])
     else:
