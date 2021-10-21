@@ -33,8 +33,12 @@ def push_token():
         check_token = Tokens.get_or_none(Tokens.token == token)
         if check_token is None:
             Tokens.create(user_id=user_id, platform=platform, token=token)
+        else:
+            if check_token.user_id != user_id:
+                tokendel = Tokens.get(Tokens.user_id == user_id)
+                tokendel.delete_istance()
+                Tokens.create(user_id=user_id, platform=platform, token=token)
         return jsonify({'message': 'success'}), 200
-
 
 @app.route('/send_push', methods=['POST'])
 def send_push():
@@ -57,6 +61,7 @@ def send_push():
                 ios_tokens.append(string['token'])
             elif string['platform'] == 1:
                 android_tokens.append(string['token'])
+        answer = []
         if len(web_tokens) > 0:
             for token in web_tokens:
                 headers = {
@@ -69,7 +74,9 @@ def send_push():
                         'body': 'У тебя новое сообщение от ' + user_name + ':\n' + message},
                     'to': token, 'priority': 'high'}
                 response = requests.post("https://fcm.googleapis.com/fcm/send", headers=headers, data=json.dumps(body))
-        return jsonify({"message": 'success'})
+                answer.append(response.json())
+                print(response.json())
+        return jsonify({"message": 'success', "answers": answer})
 
 
 @app.route('/chat_history', methods=['POST'])
