@@ -47,7 +47,6 @@ def send_push():
         except KeyError:
             return jsonify({'message': 'invalid data'}), 422
         token_list = list(Tokens.select().where(Tokens.user_id == user_id).dicts())
-        print(token_list)
         web_tokens = []
         ios_tokens = []
         android_tokens = []
