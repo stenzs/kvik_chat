@@ -188,7 +188,7 @@ def text(message):
         room = str((message['recipient'])['id']) + '&' + str((message['sender'])['id']) + '&' + str((message['product'])['id'])
     else:
         room = str((message['sender'])['id']) + '&' + str((message['recipient'])['id']) + '&' + str((message['product'])['id'])
-    if len(message['message']) > 350:
+    if len(message['message']) > 1000:
         send({'msg': 'msg_to_looooong'}, to=room)
     else:
         time_dict = {"y": datetime.now().strftime("%Y"), "mo": datetime.now().strftime("%m"),
