@@ -35,7 +35,7 @@ def push_token():
             Tokens.create(user_id=user_id, platform=platform, token=token)
         else:
             if check_token.user_id != user_id:
-                tokendel = Tokens.get(Tokens.user_id == user_id)
+                tokendel = Tokens.get(Tokens.token == token)
                 tokendel.delete_istance()
                 Tokens.create(user_id=user_id, platform=platform, token=token)
         return jsonify({'message': 'success'}), 200
