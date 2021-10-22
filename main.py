@@ -71,9 +71,11 @@ def send_push():
                 body = {
                     'notification': {
                         'title': 'KVIK',
-                        'body': 'У вас новое сообщение от ' + user_name + ':\n' + message},
+                        'body': 'У вас новое сообщение от ' + user_name + ':\n' + message,
                         'icon': 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Windows_Settings_app_icon.png/1024px-Windows_Settings_app_icon.png',
                         'click_action': 'https://https://google.com/',
+                        'image': 'https://blog.back4app.com/wp-content/uploads/2021/01/Firebase-Cloud-Messaging.png'
+                        },
                     'to': token, 'priority': 'high'}
                 response = requests.post("https://fcm.googleapis.com/fcm/send", headers=headers, data=json.dumps(body))
                 answer.append(response.json())
