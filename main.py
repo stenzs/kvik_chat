@@ -71,7 +71,10 @@ def send_push():
                 body = {
                     'notification': {
                         'title': 'KVIK',
-                        'body': 'У тебя новое сообщение от ' + user_name + ':\n' + message},
+                        'body': 'У вас новое сообщение от ' + user_name + ':\n' + message},
+                        'image': 'https://www.cloudsavvyit.com/thumbcache/0/0/45ad344e9fc637cba3d036df331a34e5/p/uploads/2019/10/42c37369.png',
+                        'icon': 'https://cdn-images-1.medium.com/max/1200/1*ti5CnGh_T4Kqy5aCTLJRcg.png',
+                        'badge': 'https://image.similarpng.com/very-thumbnail/2020/10/Golden-empty-badge-label-element-on-transparent-background-PNG.png',
                     'to': token, 'priority': 'high'}
                 response = requests.post("https://fcm.googleapis.com/fcm/send", headers=headers, data=json.dumps(body))
                 answer.append(response.json())
