@@ -73,7 +73,7 @@ def send_push():
                     'notification': {
                         'title': 'KVIK',
                         'body': 'У вас новое сообщение от ' + user_name + ':\n' + message,
-                        'icon': 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Windows_Settings_app_icon.png/1024px-Windows_Settings_app_icon.png',
+                        'icon': 'http://localhost:3000/logo.svg',
                         'click_action': 'https://https://google.com/',
                         'image': ''
                         },
