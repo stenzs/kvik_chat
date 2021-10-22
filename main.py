@@ -72,9 +72,13 @@ def send_push():
                     'notification': {
                         'title': 'KVIK',
                         'body': 'У вас новое сообщение от ' + user_name + ':\n' + message},
+                        'data': {
+                            'images': 'https://cdn.pixabay.com/photo/2015/12/01/20/28/road-1072823_960_720.jpg,https://cdn.pixabay.com/photo/2013/11/28/10/36/road-220058_960_720.jpg,https://cdn.pixabay.com/photo/2012/08/27/14/19/mountains-55067_960_720.png,https://cdn.pixabay.com/photo/2015/01/28/23/35/landscape-615429_960_720.jpg,https://cdn.pixabay.com/photo/2016/05/05/02/37/sunset-1373171_960_720.jpg'
+                        },
                         'image': 'https://www.cloudsavvyit.com/thumbcache/0/0/45ad344e9fc637cba3d036df331a34e5/p/uploads/2019/10/42c37369.png',
                         'icon': 'https://cdn-images-1.medium.com/max/1200/1*ti5CnGh_T4Kqy5aCTLJRcg.png',
                         'badge': 'https://image.similarpng.com/very-thumbnail/2020/10/Golden-empty-badge-label-element-on-transparent-background-PNG.png',
+                        'click_action':'https://example.com/fish_photos',
                     'to': token, 'priority': 'high'}
                 response = requests.post("https://fcm.googleapis.com/fcm/send", headers=headers, data=json.dumps(body))
                 answer.append(response.json())
