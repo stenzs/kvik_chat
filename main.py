@@ -48,9 +48,14 @@ def send_push():
             user_id = data['user_id']
             message = data['message']
             user_name = data['user_name']
-
-        except KeyError:
+            icon = data['icon']
+            click_action = data['click_action']
+        except Exception:
             return jsonify({'message': 'invalid data'}), 422
+        try:
+            image = data['image']
+        except Exception:
+            image = ''
         token_list = list(Tokens.select().where(Tokens.user_id == user_id).dicts())
         web_tokens = []
         ios_tokens = []
@@ -73,9 +78,9 @@ def send_push():
                     'notification': {
                         'title': 'KVIK',
                         'body': 'У вас новое сообщение от ' + user_name + ':\n' + message,
-                        'icon': 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Windows_Settings_app_icon.png/1024px-Windows_Settings_app_icon.png',
-                        'click_action': 'https://https://google.com/',
-                        'image': 'http://192.168.8.111:6001/images/po/91/e6/72/ec/8ad3da7c95ec5d6b59499d30bffce20211019181409202509.webp'
+                        'icon': icon,
+                        'click_action': click_action,
+                        'image': image
                         },
                     'to': token, 'priority': 'high'}
                 response = requests.post("https://fcm.googleapis.com/fcm/send", headers=headers, data=json.dumps(body))
