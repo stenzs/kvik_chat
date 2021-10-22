@@ -75,7 +75,7 @@ def send_push():
                         'body': 'У вас новое сообщение от ' + user_name + ':\n' + message,
                         'icon': 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Windows_Settings_app_icon.png/1024px-Windows_Settings_app_icon.png',
                         'click_action': 'https://https://google.com/',
-                        'image': 'http://192.168.8.111:6001/images/po/0a/4d/d1/8f/7e…e5b523bd1bf8c5f1738949ab20211019181409232700.webp'
+                        'image': 'http://192.168.8.111:6001/images/po/91/e6/72/ec/8ad3da7c95ec5d6b59499d30bffce20211019181409202509.webp'
                         },
                     'to': token, 'priority': 'high'}
                 response = requests.post("https://fcm.googleapis.com/fcm/send", headers=headers, data=json.dumps(body))
