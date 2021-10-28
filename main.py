@@ -89,7 +89,7 @@ def send_push():
         return jsonify({"message": 'success', "answers": answer})
 
 
-@app.route('/chat_history', methods=['POST'])
+@app.route('/chat_history', methods=['POST', 'DELETE'])
 def chat_history():
     if request.method == 'POST':
         data = request.get_json()
@@ -99,7 +99,7 @@ def chat_history():
             recipient_id = data['companion_id']
             last_message_id = data['last_message_id']
             product_id = data['product_id']
-        except KeyError:
+        except Exception:
             return jsonify({'message': 'invalid data'}), 422
         if recipient_id < sender_id:
             room = str(recipient_id) + '&' + str(sender_id) + '&' + str(product_id)
@@ -115,7 +115,20 @@ def chat_history():
             query = list(Messages.select().where(Messages.room == room,
                                                  Messages.id < last_message_id, Messages.delete != True).dicts().limit(page_limit).order_by(Messages.id.desc()))
             return jsonify({'message': 'success', 'data': query}), 200
-
+    if request.method == 'DELETE':
+        data = request.get_json()
+        try:
+            id = data['id']
+            room = data['room']
+        except Exception:
+            return jsonify({'message': 'invalid data'}), 422
+        message = Messages.get_or_none(Messages.id == id and Messages.room == room)
+        if message is None:
+            return jsonify({'message': 'error'}), 403
+        message_del = Messages(delete=True)
+        message_del.id = id
+        message_del.save()
+        return jsonify({'message': 'success'}), 200
 
 @app.route('/chat_last_messages', methods=['POST'])
 def chat_last_messages():
@@ -123,7 +136,7 @@ def chat_last_messages():
         data = request.get_json()
         try:
             user_id = data['user_id']
-        except KeyError:
+        except Exception:
             return jsonify({'message': 'invalid data'}), 422
         subq = Messages.select(fn.MAX(Messages.id).alias('room')).group_by(Messages.room).dicts().where(((Messages.sender_id == user_id) & (Messages.delete != True)) | ((Messages.recipient_id == user_id) & (Messages.delete != True)))
         query = list(Messages.select(Messages.message, Messages.messages_is_read, Messages.sender_id, Messages.time, Rooms.seller_id, Rooms.customer_id, Rooms.product_id).where(Messages.id.in_(subq)).dicts().order_by(Messages.id.desc()).join(Rooms, on=(Messages.room == Rooms.name)))
@@ -138,7 +151,7 @@ def make_room():
             seller_id = data['seller_id']
             customer_id = data['customer_id']
             product_id = data['product_id']
-        except KeyError:
+        except Exception:
             return jsonify({'message': 'invalid data'}), 422
         if seller_id < customer_id:
             room = str(seller_id) + '&' + str(customer_id) + '&' + str(product_id)
@@ -161,7 +174,7 @@ def join(message):
     query = Messages.update(messages_is_read=True).where(Messages.sender_id == (message['recipient'])['id'],
                                                          Messages.messages_is_read == False, Messages.room == room)
     query.execute()
-    send({'msg': 'user_join', 'user_jo': (message['sender'])['id']}, to=room)
+    send({'msg': 'user_join', 'user_jo': (message['sender'])['id'], 'room': room}, to=room)
 
 
 @socketio.on('leave')
@@ -171,7 +184,7 @@ def join(message):
     else:
         room = str((message['sender'])['id']) + '&' + str((message['recipient'])['id']) + '&' + str((message['product'])['id'])
     leave_room(room)
-    send({'msg': 'user_leave', 'user_le': (message['sender'])['id']}, to=room)
+    send({'msg': 'user_leave', 'user_le': (message['sender'])['id'], 'room': room}, to=room)
 
 
 @socketio.on('online')
@@ -183,7 +196,7 @@ def join(message):
     query = Messages.update(messages_is_read=True).where(Messages.sender_id == (message['recipient'])['id'],
                                                          Messages.messages_is_read == False, Messages.room == room)
     query.execute()
-    send({'msg': 'user_online', 'user_on': (message['sender'])['id']}, to=room)
+    send({'msg': 'user_online', 'user_on': (message['sender'])['id'], 'room': room}, to=room)
 
 
 @socketio.on('typing')
@@ -193,7 +206,7 @@ def join(message):
     else:
         room = str((message['sender'])['id']) + '&' + str((message['recipient'])['id']) + '&' + str((message['product'])['id'])
     join_room(room)
-    send({'msg': 'user_typing', 'user_t': (message['sender'])['id']}, to=room)
+    send({'msg': 'user_typing', 'user_t': (message['sender'])['id'], 'room': room}, to=room)
 
 
 @socketio.on('text')
