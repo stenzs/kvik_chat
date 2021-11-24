@@ -5,6 +5,7 @@ from flask_socketio import SocketIO, send, join_room, leave_room
 from datetime import datetime
 from peewee import fn
 import requests
+import jwt
 import config
 from database import Messages, Rooms, Tokens
 
@@ -23,12 +24,24 @@ def hello():
 @app.route('/push_token', methods=['POST'])
 def push_token():
     if request.method == 'POST':
+
+        headers = request.headers
+        if 'x-access-token' not in headers:
+            return 'A token is required for authentication', 400
+        try:
+            decode_token = jwt.decode(headers['x-access-token'], config.kvik_token, algorithms=["HS256"])
+        except Exception as e:
+            print(e)
+            return 'Invalid Token', 400
+        if decode_token['sub'] != request.get_json()['user_id']:
+            return 'Invalid Token', 400
+
         data = request.get_json()
         try:
             user_id = data['user_id']
             platform = data['platform']
             token = data['token']
-        except KeyError:
+        except Exception:
             return jsonify({'message': 'invalid data'}), 422
         check_token = Tokens.get_or_none(Tokens.token == token)
         if check_token is None:
@@ -43,6 +56,18 @@ def push_token():
 @app.route('/send_push', methods=['POST'])
 def send_push():
     if request.method == 'POST':
+
+        headers = request.headers
+        if 'x-access-token' not in headers:
+            return 'A token is required for authentication', 400
+        try:
+            decode_token = jwt.decode(headers['x-access-token'], config.kvik_token, algorithms=["HS256"])
+        except Exception as e:
+            print(e)
+            return 'Invalid Token', 400
+        if decode_token['sub'] != request.get_json()['from_user_id']:
+            return 'Invalid Token', 400
+
         data = request.get_json()
         try:
             user_id = data['user_id']
@@ -92,6 +117,18 @@ def send_push():
 @app.route('/chat_history', methods=['POST', 'DELETE'])
 def chat_history():
     if request.method == 'POST':
+
+        headers = request.headers
+        if 'x-access-token' not in headers:
+            return 'A token is required for authentication', 400
+        try:
+            decode_token = jwt.decode(headers['x-access-token'], config.kvik_token, algorithms=["HS256"])
+        except Exception as e:
+            print(e)
+            return 'Invalid Token', 400
+        if decode_token['sub'] != request.get_json()['user_id']:
+            return 'Invalid Token', 400
+
         data = request.get_json()
         try:
             page_limit = data['page_limit']
@@ -133,6 +170,18 @@ def chat_history():
 @app.route('/chat_last_messages', methods=['POST'])
 def chat_last_messages():
     if request.method == 'POST':
+
+        headers = request.headers
+        if 'x-access-token' not in headers:
+            return 'A token is required for authentication', 400
+        try:
+            decode_token = jwt.decode(headers['x-access-token'], config.kvik_token, algorithms=["HS256"])
+        except Exception as e:
+            print(e)
+            return 'Invalid Token', 400
+        if decode_token['sub'] != request.get_json()['user_id']:
+            return 'Invalid Token', 400
+
         data = request.get_json()
         try:
             user_id = data['user_id']
@@ -146,6 +195,18 @@ def chat_last_messages():
 @app.route('/make_room', methods=['POST'])
 def make_room():
     if request.method == 'POST':
+
+        headers = request.headers
+        if 'x-access-token' not in headers:
+            return 'A token is required for authentication', 400
+        try:
+            decode_token = jwt.decode(headers['x-access-token'], config.kvik_token, algorithms=["HS256"])
+        except Exception as e:
+            print(e)
+            return 'Invalid Token', 400
+        if (decode_token['sub'] != request.get_json()['seller_id']) and (decode_token['sub'] != request.get_json()['customer_id']):
+            return 'Invalid Token', 400
+
         data = request.get_json()
         try:
             seller_id = data['seller_id']
